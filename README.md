@@ -1,8 +1,10 @@
 # ActiveCacher
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/active_cacher`. To experiment with that code, run `bin/console` for an interactive prompt.
-
-TODO: Delete this and the text above, and describe your gem
+[![RubyGems][gem_version_badge]][ruby_gems]
+[![Travis CI][travis_ci_badge]][travis_ci]
+[![Code Climate][code_climate_badge]][code_climate]
+[![Code Climate Coverage][code_climate_coverage_badge]][code_climate]
+[![RubyGems][gem_downloads_badge]][ruby_gems]
 
 ## Installation
 
@@ -22,7 +24,49 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+Module for caching results of method invocations. It's used as follows:
+
+```ruby
+class A
+  prepend ActiveCacher.instance
+  instance_cache :foo_a, :foo_b
+  rails_cache :foo_c
+
+   def foo_a
+     # some code
+   end
+   def foo_b
+     # some code
+   end
+   def foo_c
+     # some code
+   end
+end
+```
+
+Here return values of method calls `foo_a` and `foo_b` will be cached into
+instance variables `@_foo_a` and `@__foo_b` while result of method call `foo_c`
+will be both cached into instance variable `@_foo_c` and written to Rails cache.
+
+Calling `instance_cache :foo_a` is roughly equivalent to the following code:
+
+```ruby
+def foo_a
+  @__foo_a ||= begin
+    # some code
+  end
+end
+```
+
+And calling `rails_cache :foo_c` is roughly equivalent to the following code:
+
+```ruby
+def foo_c
+  @__foo_c ||= Rails.cache.fetch [self, :foo_c] do
+    # some code
+  end
+end
+```
 
 ## Development
 
