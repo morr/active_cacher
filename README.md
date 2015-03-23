@@ -2,7 +2,6 @@
 
 [![Gem Version](https://badge.fury.io/rb/active_cacher.svg)](http://badge.fury.io/rb/active_cacher)
 [![Code Climate](https://codeclimate.com/github/morr/active_cacher/badges/gpa.svg)](https://codeclimate.com/github/morr/active_cacher)
-[![Test Coverage](https://codeclimate.com/github/morr/active_cacher/badges/coverage.svg)](https://codeclimate.com/github/morr/active_cacher)
 [ ![Codeship Status for morr/active_cacher](https://codeship.com/projects/1b1e57d0-b374-0132-f2c3-7e1d8cf367b9/status?branch=master)](https://codeship.com/projects/70198)
 
 ## Installation
