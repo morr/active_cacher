@@ -1,4 +1,5 @@
-require "active_cacher/version"
+require 'active_cacher/version'
+require 'active_support'
 
 # Module for caching results of method invocations. It's used as follows:
 #
@@ -53,17 +54,6 @@ module ActiveCacher
     raise "do not prepend ActiveCacher - prepend ActiveCacher.instance instead" unless @cloned
     cacher = self
 
-    target.send :define_singleton_method, :rails_cache do |*methods|
-      methods.each do |method|
-        escaped_method = method.to_s.include?('?') ? "is_#{method[0..-2]}" : method
-
-        cacher.send :define_method, method do |*args|
-          instance_variable_get("@__#{escaped_method}") ||
-            instance_variable_set("@__#{escaped_method}", Rails.cache.fetch([cache_key_object, method], expires_in: 2.weeks) { prepare_for_cache(super(*args)) })
-        end
-      end
-    end
-
     target.send :define_singleton_method, :instance_cache do |*methods|
       methods.each do |method|
         escaped_method = method.to_s.include?('?') ? "is_#{method[0..-2]}" : method
@@ -71,6 +61,19 @@ module ActiveCacher
         cacher.send :define_method, method do |*args|
           instance_variable_get("@__#{escaped_method}") ||
             instance_variable_set("@__#{escaped_method}", prepare_for_cache(super(*args)))
+        end
+      end
+    end
+
+    if defined?(Rails)
+      target.send :define_singleton_method, :rails_cache do |*methods|
+        methods.each do |method|
+          escaped_method = method.to_s.include?('?') ? "is_#{method[0..-2]}" : method
+
+          cacher.send :define_method, method do |*args|
+            instance_variable_get("@__#{escaped_method}") ||
+              instance_variable_set("@__#{escaped_method}", Rails.cache.fetch([cache_key_object, method], expires_in: 2.weeks) { prepare_for_cache(super(*args)) })
+          end
         end
       end
     end
